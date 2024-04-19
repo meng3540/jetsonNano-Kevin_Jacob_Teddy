@@ -302,3 +302,107 @@ Run the Inference
 deepstream-app -c deepstream_app_config.txt
 ```
 
+
+
+## 6. YOLOv3 TensorRT Conversion Steps
+
+### 6.1. Make sure to have Python 3.8-venv installed and create a virtual environment:
+
+   ```bash
+   sudo apt-get install python3.8-venv
+   python3.8 -m venv myenv
+   source myenv/bin/activate
+   ```
+
+### 6.2. Activate the virtual environment:
+
+   ```bash
+   source myenv/bin/activate
+   ```
+
+### 6.3. Clone the darknet repository:
+
+   ```bash
+   git clone <darknet_repo_url>
+   ```
+
+### 6.4. Edit the darknet Makefile as needed.
+
+### 6.5. Compile darknet:
+
+   ```bash
+   cd darknet
+   make
+   ```
+
+### 6.6. Download the pre-trained weights for YOLOv3:
+
+   ```bash
+   wget <weights_url>
+   ```
+
+### 6.7. Run YOLOv3 inference on a test image using darknet:
+
+   ```bash
+   ./darknet detector test cfg/coco.data cfg/yolov3.cfg <path_to_weights> <path_to_test_image>
+   ```
+
+### 6.8. Install TensorRT conversion requirements:
+
+   ```bash
+   sudo apt-get install python3-libnvinfer python3-libnvinfer-dev
+   ```
+
+### 6.9. Convert the YOLO model to ONNX format for TensorRT:
+
+   ```bash
+   python3 yolo_to_onnx.py
+   ```
+
+### 6.10. Move the cfg and weights files to 
+
+   ```bash
+   /usr/src/tensorrt/samples/python/yolov3_onnx
+   ```
+
+### 6.11. Set TRT_DATA_DIR to 
+
+   ```bash
+   /usr/src/tensorrt
+   ```
+
+### 6.12. Modify yolo_to_onnx script to save to a directory with write permission.
+
+### 6.13. Update pip
+
+   ```bash
+   pip install --upgrade pip
+   ```
+
+### 6.14. Add ~/.local/bin to PATH:
+
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+### 6.15. Install PyCUDA:
+
+   ```bash
+   python3 -m pip install pycuda --no-binary :all:
+   ```
+
+### 6.16. Edit onnx_to_tensorrt script to save to a writable directory.
+
+### 6.17. Move files as needed (e.g., dog.jpg, yolo.onnx).
+
+### 6.18. Convert the ONNX file to TensorRT format:
+
+   ```bash
+   python3 onnx_to_tensorrt.py
+   ```
+
+### 6.19. Reconvert the ONNX file according to the instructions at <a href="https://elinux.org/TensorRT/YoloV3">here</a>.
+
+
+
+
