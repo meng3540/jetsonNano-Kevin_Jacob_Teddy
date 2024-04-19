@@ -127,7 +127,6 @@ Install the necessary packages
 
 ```clike
 pip3 install -r requirements.txt
-
 ```
 
 
@@ -181,7 +180,6 @@ Here is a list of the corresponding torchvision versions that you need to instal
 Clone the following repo
 
 ```clike
-
 cd ~git clone https://github.com/marcoslucianops/DeepStream-Yolo
 ```
 
@@ -210,7 +208,6 @@ Copy the export_yoloV8.py file from DeepStream-Yolo/utils directory to the ultra
 Download the desired model from YOLOv8’s releases.
 
 ```clike
-
 wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
 ```
 
@@ -254,7 +251,6 @@ Copy the generated ONNX model and labels.txt (if generated) into the DeepStream-
 Open the DeepStream-Yolo folder and compile the library
 
 ```clike
-
 cd ~/DeepStream-Yolo
 CUDA_VER=11.4 make -C nvdsinfer_custom_impl_Yolo # for DeepStream 6.1
 CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo # for DeepStream 6.0.1 / 6.0
