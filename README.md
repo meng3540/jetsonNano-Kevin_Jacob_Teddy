@@ -29,14 +29,8 @@ To prepare your microSD card, you’ll need a computer with an Internet connecti
 
 There are two ways to interact with the developer kit: 
 
-1. With display, keyboard and mouse attached, which did not work for us or 
-2. In “headless mode” via a connection from another computer. We will be using this method.
-
-### 3.3. Initial Setup Headless Mode
-
-To complete setup when no display is attached to the developer kit, you’ll need to connect the developer kit to another computer and then communicate with it via a terminal application (e.g PuTTY, Serial, speed 115200, with the right COM port) to handle the USB serial communication on that other computer.
-
-Note: Headless initial configuration requires the developer kit to be powered by a DC power supply with a barrel jack connector since the Micro-USB port is required to access the initial configuration prompts.
+1. With display, keyboard and mouse attached, We will be using this method.
+2. In “headless mode” via a connection from another computer. 
 
 ## 4. Setup Steps
 
@@ -62,15 +56,83 @@ A green LED next to the Micro-USB connector will light as soon as the developer 
 - Create a username, password, and computer name
 - Select APP partition size—it is recommended to use the max size suggested
 
-### 4.2. After Logging In
+## 5 Deploying Darknet with YOLOv4 on GPU and CPU
 
-You will see a standard Linux command line prompt in your serial terminal application. Congratulations!
+### 5.1 Step 1: CPU VERSION
+```bash
+GPU=0
+CUDNN=0
+CUDNN_HALF=0
+OPENCV=1
+OPENMP=1
+LIBSO=1
+```
+### 5.2 Step 2: Run Make
+```bash
+make
+```
+### 5.3 Step 3: Run Darknet
+5. ./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
 
-To deploy a trained model into the NVIDIA Jetson Platform and perform inference using TensorRT and DeepStream SDK, we used TensorRT to maximize the inference performance on the Jetson platform. Once Jetpack is installed and ready, we will install YOLOV8 and the necessary packages as follows.
+### 5.4 Step 4: Check out Darknet and enter folder
+```bash
+git clone https://github.com/AlexeyAB/darknet.git
+cd darknet
+```
 
-### 4.3. Install Necessary Packages
+### 5.5 Step 5: Edit Makefile
+```bash
+nano Makefile
 
-#### 4.3.1. Step 1
+GPU=1
+CUDNN=1
+CUDNN_HALF=1
+OPENCV=1
+AVX=0
+OPENMP=1
+LIBSO=1
+ZED_CAMERA=0
+ZED_CAMERA_v2_8=0
+
+......
+
+USE_CPP=0
+DEBUG=0
+
+ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
+
+......
+
+NVCC=/usr/local/cuda/bin/nvcc
+```
+
+### 5.6 Step 6: Run Make
+```bash
+make
+```
+
+### 5.7 Step 7: Download yolov4-tiny.weights
+```bash
+wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
+```
+### 5.8 Step 8: Test
+```bash
+./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
+```
+
+## 6 Results
+
+# _Steps we tried_ 
+___
+## 1. Initial Setup Headless Mode
+
+To complete setup when no display is attached to the developer kit, you’ll need to connect the developer kit to another computer and then communicate with it via a terminal application (e.g PuTTY, Serial, speed 115200, with the right COM port) to handle the USB serial communication on that other computer.
+
+Note: Headless initial configuration requires the developer kit to be powered by a DC power supply with a barrel jack connector since the Micro-USB port is required to access the initial configuration prompts.
+
+## 2. Install Necessary Packages
+
+### 2.1. Step 1
 
 Access the terminal of the Jetson device, install pip and upgrade it
 
@@ -81,7 +143,7 @@ pip3 install --upgrade pip
 ```
 
 
-#### 4.3.2. Step 2
+### 2.2. Step 2
 
 Clone the following repo
 
@@ -90,7 +152,7 @@ git clone https://github.com/ultralytics/yolov8
 ```
 
 
-#### 4.3.3. Step 3
+### 2.3. Step 3
 
 Open requirements.txt
 
@@ -100,7 +162,7 @@ vi requirements.txt
 ```
 
 
-#### 4.3.4. Step 4
+### 2.4. Step 4
 
 Edit the following lines. Here you need to press i first to enter editing mode. Press ESC, then type :wq to save and quit
 
@@ -112,7 +174,7 @@ Edit the following lines. Here you need to press i first to enter editing mode. 
 
 Note: torch and torchvision are excluded for now because they will be installed later.
 
-#### 4.3.5. Step 5
+### 2.5. Step 5
 
 Install the below dependency
 
@@ -121,7 +183,7 @@ sudo apt install -y libfreetype6-dev
 ```
 
 
-#### 4.3.6. Step 6
+### 2.6. Step 6
 
 Install the necessary packages
 
@@ -130,11 +192,11 @@ pip3 install -r requirements.txt
 ```
 
 
-### 4.4. PyTorch and Torchvision on ARM Architecture (Jetson Platform)
+## 3. PyTorch and Torchvision on ARM Architecture (Jetson Platform)
 
 We cannot install PyTorch and Torchvision from pip because they are not compatible to run on the Jetson platform which is based on ARM aarch64 architecture. Therefore, we need to manually install a pre-built PyTorch pip wheel and compile/ install Torchvision from source.
 
-#### 4.4.1. Step 1
+### 3.1. Step 1
 
 Install torch according to your JetPack version in the following format
 
@@ -144,7 +206,7 @@ pip3 install <file_name>
 ```
 
 
-###### 4.4.1.1. Example
+#### 3.1.1. Example
 
 Here we are running JP5.1, and therefore we choose PyTorch v1.10.0
 
@@ -156,7 +218,7 @@ pip3 install torch-1.10.0-cp36-cp36m-linux_aarch64.whl
 ```
 
 
-#### 4.4.2. Step 2
+#### 3.1.2. Step 2
 
 Install torchvision depending on the version of PyTorch that you have installed. For example, we chose PyTorch v1.10.0, which means, we need to choose Torchvision v0.11.1
 
@@ -173,9 +235,9 @@ Here is a list of the corresponding torchvision versions that you need to instal
 - PyTorch v1.10 - torchvision v0.11.1
 - PyTorch v1.12 - torchvision v0.13.0
 
-## 5. DeepStream Configuration for YOLOv8
+## 4. DeepStream Configuration for YOLOv8
 
-### 5.1. Step 1
+### 4.1. Step 1
 
 Clone the following repo
 
@@ -184,7 +246,7 @@ cd ~git clone https://github.com/marcoslucianops/DeepStream-Yolo
 ```
 
 
-### 5.2. Step 2
+### 4.2. Step 2
 
 Install YOLOv8 and other requirements
 
@@ -199,11 +261,11 @@ pip3 install onnx onnxsim onnxruntime
 
 It is noted that this is best done in a Python virturalenv.
 
-### 5.3. Step 3
+### 4.3. Step 3
 
 Copy the export_yoloV8.py file from DeepStream-Yolo/utils directory to the ultralytics folder.
 
-### 5.4. Step 4
+### 4.4. Step 4
 
 Download the desired model from YOLOv8’s releases.
 
@@ -212,7 +274,7 @@ wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
 ```
 
 
-### 5.5. Step 5
+### 4.5. Step 5
 
 Convert the model to a usable form.
 
@@ -242,11 +304,11 @@ or
 ```
 
 
-### 5.6. Step 6
+### 4.6. Step 6
 
 Copy the generated ONNX model and labels.txt (if generated) into the DeepStream-Yolo folder
 
-### 5.7. Step 7
+### 4.7. Step 7
 
 Open the DeepStream-Yolo folder and compile the library
 
@@ -257,7 +319,7 @@ CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo # for DeepStream 6.0.1 / 6.0
 ```
 
 
-### 5.8. Step 8
+### 4.8. Step 8
 
 Edit the config_infer_primary_yoloV8.txt file according to your model. This example sets the maximum number of detected classes to 80.
 
@@ -275,7 +337,7 @@ symmetric-padding=1
 ```
 
 
-### 5.9. Step 9
+### 4.9. Step 9
 
 Edit the deepstream_app_config file
 
@@ -287,7 +349,7 @@ config-file=config_infer_primary_yoloV8.txt
 ```
 
 
-### 5.10. Step 10
+### 4.10. Step 10
 
 Change the video source in deepstream_app_config file. Here a default video file is loaded as you can see below
 
@@ -304,9 +366,9 @@ deepstream-app -c deepstream_app_config.txt
 
 
 
-## 6. YOLOv3 TensorRT Conversion Steps
+## 5. YOLOv3 TensorRT Conversion Steps
 
-### 6.1. Make sure to have Python 3.8-venv installed and create a virtual environment:
+### 5.1. Make sure to have Python 3.8-venv installed and create a virtual environment:
 
    ```bash
    sudo apt-get install python3.8-venv
@@ -314,156 +376,93 @@ deepstream-app -c deepstream_app_config.txt
    source myenv/bin/activate
    ```
 
-### 6.2. Activate the virtual environment:
+### 5.2. Activate the virtual environment:
 
    ```bash
    source myenv/bin/activate
    ```
 
-### 6.3. Clone the darknet repository:
+### 5.3. Clone the darknet repository:
 
    ```bash
    git clone <darknet_repo_url>
    ```
 
-### 6.4. Edit the darknet Makefile as needed.
+### 5.4. Edit the darknet Makefile as needed.
 
-### 6.5. Compile darknet:
+### 5.5. Compile darknet:
 
    ```bash
    cd darknet
    make
    ```
 
-### 6.6. Download the pre-trained weights for YOLOv3:
+### 5.6. Download the pre-trained weights for YOLOv3:
 
    ```bash
    wget <weights_url>
    ```
 
-### 6.7. Run YOLOv3 inference on a test image using darknet:
+### 5.7. Run YOLOv3 inference on a test image using darknet:
 
    ```bash
    ./darknet detector test cfg/coco.data cfg/yolov3.cfg <path_to_weights> <path_to_test_image>
    ```
 
-### 6.8. Install TensorRT conversion requirements:
+### 5.8. Install TensorRT conversion requirements:
 
    ```bash
    sudo apt-get install python3-libnvinfer python3-libnvinfer-dev
    ```
 
-### 6.9. Convert the YOLO model to ONNX format for TensorRT:
+### 5.9. Convert the YOLO model to ONNX format for TensorRT:
 
    ```bash
    python3 yolo_to_onnx.py
    ```
 
-### 6.10. Move the cfg and weights files to 
+### 5.10. Move the cfg and weights files to 
 
    ```bash
    /usr/src/tensorrt/samples/python/yolov3_onnx
    ```
 
-### 6.11. Set TRT_DATA_DIR to 
+### 5.11. Set TRT_DATA_DIR to 
 
    ```bash
    /usr/src/tensorrt
    ```
 
-### 6.12. Modify yolo_to_onnx script to save to a directory with write permission.
+### 5.12. Modify yolo_to_onnx script to save to a directory with write permission.
 
-### 6.13. Update pip
+### 5.13. Update pip
 
    ```bash
    pip install --upgrade pip
    ```
 
-### 6.14. Add ~/.local/bin to PATH:
+### 5.14. Add ~/.local/bin to PATH:
 
    ```bash
    export PATH="/usr/local/cuda/bin:$PATH"
    ```
 
-### 6.15. Install PyCUDA:
+### 5.15. Install PyCUDA:
 
    ```bash
    python3 -m pip install pycuda --no-binary :all:
    ```
 
-### 6.16. Edit onnx_to_tensorrt script to save to a writable directory.
+### 5.16. Edit onnx_to_tensorrt script to save to a writable directory.
 
-### 6.17. Move files as needed (e.g., dog.jpg, yolo.onnx).
+### 5.17. Move files as needed (e.g., dog.jpg, yolo.onnx).
 
-### 6.18. Convert the ONNX file to TensorRT format:
+### 5.18. Convert the ONNX file to TensorRT format:
 
    ```bash
    python3 onnx_to_tensorrt.py
    ```
 
-### 6.19. Reconvert the ONNX file according to the instructions at <a href="https://elinux.org/TensorRT/YoloV3">here</a>.
+### 5.19. Reconvert the ONNX file according to the instructions at <a href="https://elinux.org/TensorRT/YoloV3">here</a>.
 
-## 7 Deploying Darknet with YOLOv4 on GPU and CPU
-
-### 7.1 Step 1: Check out Darknet and enter folder
-```bash
-git clone https://github.com/AlexeyAB/darknet.git
-cd darknet
-```
-
-### 7.2 Step 2: Edit Makefile
-```bash
-nano Makefile
-
-GPU=1
-CUDNN=1
-CUDNN_HALF=1
-OPENCV=1
-AVX=0
-OPENMP=1
-LIBSO=1
-ZED_CAMERA=0
-ZED_CAMERA_v2_8=0
-
-......
-
-USE_CPP=0
-DEBUG=0
-
-ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
-
-......
-
-NVCC=/usr/local/cuda/bin/nvcc
-```
-
-### 7.3 Step 3: Run Make
-```bash
-make
-```
-
-### 7.4 Step 4: Download yolov4-tiny.weights
-```bash
-wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
-```
-### 7.5 Step 5: Test
-```bash
-./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
-```
-
-### 7.6 Step 6: CPU VERSION
-```bash
-GPU=0
-CUDNN=0
-CUDNN_HALF=0
-OPENCV=1
-OPENMP=1
-LIBSO=1
-```
-### 7.7 Step 7: Run Make
-```bash
-make
-```
-### 7.8 Step 8: Run Darknet
-5. ./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
 
