@@ -135,23 +135,22 @@ jtop
 ## 6 Results
 
 ## 6.1 Darknet CPU Only
-Running the model on the CPU was incredibly slow. Even after setting the Jetson to maximum power with the nvpmodel and jetson_clocks commands, the frame rate of the detections was unusable at 0.8FPS. It can be seen from jtop that the model is only running on a signle CPU core, and is not utilizing the GPU. 
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPU_jetsonclocks.png)
 
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPUversion.png)
-
-To provide a baseline to compare against, a screenshot of jtop while the jetson was idle was also taken.
+To provide a baseline to compare against, a screenshot of jtop while the jetson was idle was taken. Note how the speeds of the CPU cores are 729MHz. This indicates that jetson_clocks has not been run, forcing all the clocks to maximum.
 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/idlejtop.png)
 
+Running the model on the CPU was incredibly slow. Even after setting the Jetson to maximum power with the nvpmodel and jetson_clocks commands, the frame rate of the detections was unusable at 0.8FPS. It can be seen from jtop that the model is only running on a signle CPU core, and is not utilizing the GPU. Note how the CPU clock speed for the core in use is running at 1.5MHz, the maximum, as well as a few other cores with recent activity. Running jetson_clocks will not increase the clock speed of the core in use by darknet any higher, though it would force the ther cores to stay at 1.5MHz, possibly resulting in better system responsiveness. Darknet would not run any faster though. 
+![Image of darknet running inference on CPU after running jetson_clocks. Note no significant improvement.](res/CPU_jetsonclocks.png)
+
 Darknet was recompiled this time with settings to enable the GPU to be used. The model was run again. A very large performance boost was seen, as the displayed image updated in realtime and the FPS of the inference shot up to 14FPS. This is perhaps slower than ideal for some use cases where fast detetion may be critical (such as self driving cars or driver assist features), but certainly useable.
 
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_darknet_pre-optim.png)
-
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_postoptim.png)
+![Image of darknet running inference on GPU. Note much better performance.](res/jtop_darknet_pre-optim.png)
 
 # _Steps we tried_ 
 ___
+We tried several methods to run a model on the GPU. Many methods ran into errors that could not be fixed within the timeframe for this project. These attempts are documented below for reference and are potential areas to explore for additional ways of achieving the goal and increasing the inference speed.
+
 ## 1. Initial Setup Headless Mode
 
 To complete setup when no display is attached to the developer kit, you’ll need to connect the developer kit to another computer and then communicate with it via a terminal application (e.g PuTTY, Serial, speed 115200, with the right COM port) to handle the USB serial communication on that other computer.
