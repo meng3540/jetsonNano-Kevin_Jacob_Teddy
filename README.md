@@ -72,15 +72,26 @@ LIBSO=1
 make
 ```
 ### 5.3 Step 3: Run Darknet
-5. ./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
+```bash
+./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
+```
+### 5.4 Step 4: Install and Run performance tools
+```bash
+sudo jetson_clocks //set clock speeds to max
+sudo nvpmodel -m 0 //set jetson to max power
+sudo apt update
+sudo pip install jetson-stats
+sudo reboot
+jtop
+```
 
-### 5.4 Step 4: Check out Darknet and enter folder
+### 5.5 Step 5: Check out Darknet and enter folder
 ```bash
 git clone https://github.com/AlexeyAB/darknet.git
 cd darknet
 ```
 
-### 5.5 Step 5: Edit Makefile
+### 5.6 Step 6: Edit Makefile
 ```bash
 nano Makefile
 
@@ -106,36 +117,38 @@ ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
 NVCC=/usr/local/cuda/bin/nvcc
 ```
 
-### 5.6 Step 6: Run Make
+### 5.7 Step 7: Run Make
 ```bash
 make
 ```
 
-### 5.7 Step 7: Download yolov4-tiny.weights
+### 5.8 Step 8: Download yolov4-tiny.weights
 ```bash
 wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
 ```
-### 5.8 Step 8: Test
+### 5.9 Step 9: Test
 ```bash
 ./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
+jtop
 ```
 
 ## 6 Results
 
 ## 6.1 Darknet CPU Only
+Running the model on the CPU was incredibly slow. Even after setting the Jetson to maximum power with the nvpmodel and jetson_clocks commands, the frame rate of the detections was unusable at 0.8FPS. It can be seen from jtop that the model is only running on a signle CPU core, and is not utilizing the GPU. 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPU_jetsonclocks.png)
 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPUversion.png)
 
+To provide a baseline to compare against, a screenshot of jtop while the jetson was idle was also taken.
+
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/idlejtop.png)
+
+Darknet was recompiled this time with settings to enable the GPU to be used. The model was run again. A very large performance boost was seen, as the displayed image updated in realtime and the FPS of the inference shot up to 14FPS. This is perhaps slower than ideal for some use cases where fast detetion may be critical (such as self driving cars or driver assist features), but certainly useable.
 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_darknet_pre-optim.png)
 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_postoptim.png)
-
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/performance_pretune.png)
-
-![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/recognizing_objects.png)
 
 # _Steps we tried_ 
 ___
