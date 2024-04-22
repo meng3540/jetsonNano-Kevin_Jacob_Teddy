@@ -10,9 +10,9 @@ Our group does have experience training and running inference on AI classificati
 
 Our proposed solution will use a webcam connected to the Jetson. This will feed images into Python, which will be picked up by OpenCV. Some image processing may be applied to the image to aid in inference, and then the image will be passed to the YOLOv8 pre-trained model. This model will return the detected objects and their locations on screen. Implementing some more OpenCV code will allow us to draw boxes around the detected objects and label them.
 
-JetPack includes Jetson Linux with bootloader, Linux kernel, Ubuntu desktop environment, and a complete set of libraries for acceleration of GPU computing, multimedia, graphics, and computer vision. It also includes samples, documentation, and developer tools for both host computer and developer kit, and supports higher-level SDKs such as DeepStream for streaming video analytics, Isaac for robotics, and Riva for conversational AI.
+JetPack includes Jetson Linux with bootloader, Linux kernel, Ubuntu desktop environment, and a complete set of libraries for acceleration of GPU computing, multimedia, graphics, and computer vision. It also includes samples, documentation, and developer tools for both the host computer and developer kit, and supports higher-level SDKs such as DeepStream for streaming video analytics, Isaac for robotics, and Riva for conversational AI.
 
-Setting up the edge device will be performed by flashing the Jetpack SDK onto an SD card. The Jetson will be connected via a serial connection over USB which will allow for the first-time setup to be completed. We have used a terminal emulator like PuTTY (Serial, speed 115200, with the right COM port) to connect to the Jetson Nano for the initial setup. Once the Linux environment was set up and run for the first time, we were able to connect a keyboard, mouse and monitor to continue setting up YOLO on our Jetson Nano. 
+Setting up the edge device will be performed by flashing the Jetpack SDK onto an SD card. The Jetson will be connected via a serial connection over USB which will allow for the first-time setup to be completed. We have used a terminal emulator like PuTTY (Serial, speed 115200, with the right COM port) to connect to the Jetson Nano for the initial setup. Once the Linux environment was set up and run for the first time, we were able to connect a keyboard, mouse, and monitor to continue setting up YOLO on our Jetson Nano. 
 
 ## 3. Set up prepare 
 
@@ -29,7 +29,7 @@ To prepare your microSD card, you’ll need a computer with an Internet connecti
 
 There are two ways to interact with the developer kit: 
 
-1. With display, keyboard and mouse attached, We will be using this method.
+1. With display, keyboard, and mouse attached, We will be using this method.
 2. In “headless mode” via a connection from another computer. 
 
 ## 4. Setup Steps
@@ -140,12 +140,35 @@ To provide a baseline to compare against, a screenshot of jtop while the jetson 
 
 ![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/idlejtop.png)
 
-Running the model on the CPU was incredibly slow. Even after setting the Jetson to maximum power with the nvpmodel and jetson_clocks commands, the frame rate of the detections was unusable at 0.8FPS. It can be seen from jtop that the model is only running on a signle CPU core, and is not utilizing the GPU. Note how the CPU clock speed for the core in use is running at 1.5MHz, the maximum, as well as a few other cores with recent activity. Running jetson_clocks will not increase the clock speed of the core in use by darknet any higher, though it would force the ther cores to stay at 1.5MHz, possibly resulting in better system responsiveness. Darknet would not run any faster though. 
+Running the model on the CPU was incredibly slow. Even after setting the Jetson to maximum power with the nvpmodel and jetson_clocks commands, the frame rate of the detections was unusable at 0.8FPS. It can be seen from jtop that the model is only running on a single CPU core, and is not utilizing the GPU. Note how the CPU clock speed for the core in use is running at 1.5MHz, the maximum, as well as a few other cores with recent activity. Running jetson_clocks will not increase the clock speed of the core in use by darknet any higher, though it would force the other cores to stay at 1.5MHz, possibly resulting in better system responsiveness. Darknet would not run any faster though. 
 ![Image of darknet running inference on CPU after running jetson_clocks. Note no significant improvement.](res/CPU_jetsonclocks.png)
 
-Darknet was recompiled this time with settings to enable the GPU to be used. The model was run again. A very large performance boost was seen, as the displayed image updated in realtime and the FPS of the inference shot up to 14FPS. This is perhaps slower than ideal for some use cases where fast detetion may be critical (such as self driving cars or driver assist features), but certainly useable.
+## 6.2 Darknet GPU
+Darknet was recompiled this time with settings to enable the GPU to be used. The model was run again. A very large performance boost was seen, as the displayed image updated in real-time and the FPS of the inference shot up to 14FPS. This is perhaps slower than ideal for some use cases where fast detection may be critical (such as self-driving cars or driver assist features), but certainly useable.
 
 ![Image of darknet running inference on GPU. Note much better performance.](res/jtop_darknet_pre-optim.png)
+
+## 7 Reflection and Learning Plan
+
+### 7.1 Reflection
+Our solution, as we had planned to implement it was not really successful. Running the YOLO models through custom Python code with Pytorch or TensorRT on the GPU proved to be very difficult and fraught with compilation errors, missing wheels, and other errors. Our versions of Pytorch and TensorRT were not compiled with CUDA support, and attempting to compile them with CUDA was too complex for the short timespan we had with the Jetson. After much searching, testing, experimenting, and restarting, we were able to deploy a solution using AlexeyAB's Darknet YOLOv4 framework. This framework, written in C was able to make use of NVCC and CUDNN to run the pre-trained YOLO models on the GPU.
+
+During our exploration, of YOLO and running GPU-accelerated applications on the Jetson, we learned several things that can be applied to our future areas of study:
+
+-Available pre-trained object detection models (YOLO)
+-How to compile programs from source
+-The importance of matching packages to the system architecture
+-The speedup afforded by running tasks on hardware specialized for those types of workloads, eg. GPU
+-How to deploy a headless machine and connect to it via serial (although we eventually switched to a graphical environment due to networking issues)
+-Some learning regarding the types of formats AI models can be available in, such as .engine (TensorRT) and ONNX (open framework for defining machine learning models)
+
+### 7.2 Learning Plan
+
+#### 7.2.1 Jacob
+The main difficulty we ran into was the lack of GPU support in the versions of PyTorch and TensorRT that were installed or able to be installed on the jetson. Despite finding multiple tutorials on the subject, and even following Ultralytics own guide to run YOLO on the Jetson, we were unable to deploy YOLO using Python. Learning more about why the GPU versions of these libraries would not install would allow us to fix that problem and then implement our own deployment of YOLO in Python as we originally set out to do. Our solution also relied on a pre-trained model. The next step to make a useful prototype might require training the model on custom data so that it can recognize objects we want it to that were not part of the original training data. Learning how to do this for YOLO would be valuable. 
+
+### 7.2.2 Kevin (Kuan-Yu)
+
 
 # _Steps we tried_ 
 ___
@@ -161,7 +184,7 @@ Note: Headless initial configuration requires the developer kit to be powered by
 
 ### 2.1. Step 1
 
-Access the terminal of the Jetson device, install pip and upgrade it
+Access the terminal of the Jetson device, install pip, and upgrade it
 
 ```clike
 sudo apt update
@@ -393,7 +416,7 @@ deepstream-app -c deepstream_app_config.txt
 
 
 
-## 5. YOLOv3 TensorRT Conversion To Use In Custom TensorRT program
+## 5. YOLOv3 TensorRT Conversion To Use In Custom TensorRT Program
 
 ### 5.1. Make sure to have Python 3.8-venv installed and create a virtual environment:
 
@@ -491,5 +514,3 @@ deepstream-app -c deepstream_app_config.txt
    ```
 
 ### 5.19. Reconvert the ONNX file according to the instructions at <a href="https://elinux.org/TensorRT/YoloV3">here</a>.
-
-
