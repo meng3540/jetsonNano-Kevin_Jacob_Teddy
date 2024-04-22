@@ -382,7 +382,7 @@ deepstream-app -c deepstream_app_config.txt
 ### 6.14. Add ~/.local/bin to PATH:
 
    ```bash
-   export PATH="$HOME/.local/bin:$PATH"
+   export PATH="/usr/local/cuda/bin:$PATH"
    ```
 
 ### 6.15. Install PyCUDA:
