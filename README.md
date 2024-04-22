@@ -242,7 +242,30 @@ Install the necessary packages
 ```clike
 pip3 install -r requirements.txt
 ```
+### 2.7 Step 7
+To implement YOLO in Python, we wrote the following code:
+```python
+from ultralytics import YOLO
+import cv2
+import torch
 
+camera = cv2.VideoCapture(0)
+
+model = YOLO('yolov8n.pt')
+model.export(format='engine', device='gpu')
+
+tRT_model = YOLO('yolov8n.engine')
+
+print (torch.cuda.is_available())
+while (True):
+    ret, frame = camera.read() 
+    results = trt_model(frame)
+    
+    if cv2.waitkey(100) & 0xFF == ord('q'):
+        break
+vid.realease()
+cv2.DestroyAllWindows()
+```
 
 ## 3. PyTorch and Torchvision on ARM Architecture (Jetson Platform)
 
