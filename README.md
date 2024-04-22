@@ -122,6 +122,9 @@ wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/y
 
 ## 6 Results
 
+## 6.1 Darknet CPU Only
+![Desc](Project_Screenshots/CPUversion.png)
+
 # _Steps we tried_ 
 ___
 ## 1. Initial Setup Headless Mode
