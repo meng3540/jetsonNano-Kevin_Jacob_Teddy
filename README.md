@@ -85,7 +85,7 @@ sudo reboot
 jtop
 ```
 
-### 5.5 Step 5: Check out Darknet and enter folder
+### 5.5 Step 5: Clone Darknet and enter folder
 ```bash
 git clone https://github.com/AlexeyAB/darknet.git
 cd darknet
@@ -157,7 +157,7 @@ To complete setup when no display is attached to the developer kit, you’ll nee
 
 Note: Headless initial configuration requires the developer kit to be powered by a DC power supply with a barrel jack connector since the Micro-USB port is required to access the initial configuration prompts.
 
-## 2. Install Necessary Packages
+## 2. Ultralytics YOLOv8
 
 ### 2.1. Step 1
 
@@ -262,7 +262,7 @@ Here is a list of the corresponding torchvision versions that you need to instal
 - PyTorch v1.10 - torchvision v0.11.1
 - PyTorch v1.12 - torchvision v0.13.0
 
-## 4. DeepStream Configuration for YOLOv8
+## 4. DeepStream + YOLOv8
 
 ### 4.1. Step 1
 
@@ -385,7 +385,7 @@ uri=/opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4
 ```
 
 
-Run the Inference
+### 4.11. Step 11
 
 ```clike
 deepstream-app -c deepstream_app_config.txt
@@ -393,7 +393,7 @@ deepstream-app -c deepstream_app_config.txt
 
 
 
-## 5. YOLOv3 TensorRT Conversion Steps
+## 5. YOLOv3 TensorRT Conversion To Use In Custom TensorRT program
 
 ### 5.1. Make sure to have Python 3.8-venv installed and create a virtual environment:
 
@@ -457,7 +457,7 @@ deepstream-app -c deepstream_app_config.txt
 ### 5.11. Set TRT_DATA_DIR to 
 
    ```bash
-   /usr/src/tensorrt
+   TRT_DATA_DIR="/usr/src/tensorrt"
    ```
 
 ### 5.12. Modify yolo_to_onnx script to save to a directory with write permission.
@@ -468,7 +468,7 @@ deepstream-app -c deepstream_app_config.txt
    pip install --upgrade pip
    ```
 
-### 5.14. Add ~/.local/bin to PATH:
+### 5.14. Add NVCC to PATH:
 
    ```bash
    export PATH="/usr/local/cuda/bin:$PATH"
