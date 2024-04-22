@@ -403,6 +403,67 @@ deepstream-app -c deepstream_app_config.txt
 
 ### 6.19. Reconvert the ONNX file according to the instructions at <a href="https://elinux.org/TensorRT/YoloV3">here</a>.
 
+## 7 Deploying Darknet with YOLOv4 on GPU and CPU
 
+### 7.1 Step 1: Check out Darknet and enter folder
+```bash
+git clone https://github.com/AlexeyAB/darknet.git
+cd darknet
+```
 
+### 7.2 Step 2: Edit Makefile
+```bash
+nano Makefile
+
+GPU=1
+CUDNN=1
+CUDNN_HALF=1
+OPENCV=1
+AVX=0
+OPENMP=1
+LIBSO=1
+ZED_CAMERA=0
+ZED_CAMERA_v2_8=0
+
+......
+
+USE_CPP=0
+DEBUG=0
+
+ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
+
+......
+
+NVCC=/usr/local/cuda/bin/nvcc
+```
+
+### 7.3 Step 3: Run Make
+```bash
+make
+```
+
+### 7.4 Step 4: Download yolov4-tiny.weights
+```bash
+wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
+```
+### 7.5 Step 5: Test
+```bash
+./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
+```
+
+### 7.6 Step 6: CPU VERSION
+```bash
+GPU=0
+CUDNN=0
+CUDNN_HALF=0
+OPENCV=1
+OPENMP=1
+LIBSO=1
+```
+### 7.7 Step 7: Run Make
+```bash
+make
+```
+### 7.8 Step 8: Run Darknet
+5. ./darknet  detector demo cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights -c 0
 
