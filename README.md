@@ -123,7 +123,19 @@ wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/y
 ## 6 Results
 
 ## 6.1 Darknet CPU Only
-![Desc](Project_Screenshots/CPUversion.png)
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPU_jetsonclocks.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/CPUversion.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/idlejtop.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_darknet_pre-optim.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/jtop_postoptim.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/performance_pretune.png)
+
+![Image of darknet running inference on CPU. Note lack of GPU usage in jtop and slow FPS.](res/recognizing_objects.png)
 
 # _Steps we tried_ 
 ___
