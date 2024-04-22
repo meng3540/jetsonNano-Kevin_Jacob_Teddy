@@ -169,6 +169,7 @@ The main difficulty we ran into was the lack of GPU support in the versions of P
 
 ### 7.2.2 Kevin (Kuan-Yu)
 
+### 7.2.3 Tewodros
 
 # _Steps we tried_ 
 ___
